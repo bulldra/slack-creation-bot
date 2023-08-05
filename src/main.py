@@ -10,14 +10,12 @@ from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 
 import url_utils
 
-SECRETS: dict = json.loads(os.getenv("SECRETS"))
-
-
 logging_client: google.cloud.logging.Client = google.cloud.logging.Client()
 logging_client.setup_logging()
 logger: logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+SECRETS: dict = json.loads(os.getenv("SECRETS"))
 app: slack_bolt.App = slack_bolt.App(
     token=SECRETS.get("SLACK_BOT_TOKEN"),
     signing_secret=SECRETS.get("SLACK_SIGNING_SECRET"),
