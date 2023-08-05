@@ -10,7 +10,6 @@ from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 
 import url_utils
 
-CONFIG: dict = json.loads(os.getenv("CONFIG"))
 SECRETS: dict = json.loads(os.getenv("SECRETS"))
 
 
@@ -22,14 +21,13 @@ logger.setLevel(logging.DEBUG)
 app: slack_bolt.App = slack_bolt.App(
     token=SECRETS.get("SLACK_BOT_TOKEN"),
     signing_secret=SECRETS.get("SLACK_SIGNING_SECRET"),
-    process_before_response=True,
     request_verification_enabled=True,
 )
 
 
 @app.event("reaction_added")
 def handle_reaction_added(event: dict):
-    if event["reaction"] == CONFIG.get("REACTION_EMOJI"):
+    if event["reaction"] == SECRETS.get("REACTION_EMOJI"):
         channel_id: str = event["item"]["channel"]
         ts: str = event["item"]["ts"]
         result: dict = app.client.conversations_history(
@@ -38,7 +36,7 @@ def handle_reaction_added(event: dict):
         logger.debug(f"reaction at: {result}")
 
         text: str = result["messages"][0]["text"]
-        link: str = url_utils.extract_link(text)
+        link: str = url_utils.extract_url(text)
 
         if link is not None:
             app.client.chat_postMessage(
