@@ -5,9 +5,7 @@ import requests
 
 
 def extract_url(text: str) -> str:
-    if text is None:
-        return None
-    links: [str] = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text)
+    links: [str] = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text or "")
     if len(links) == 0:
         return None
     else:
@@ -24,9 +22,6 @@ def extract_url(text: str) -> str:
 
 
 def remove_tracking_query(url: str) -> str:
-    url_obj: urllib.parse.ParseResult = urllib.parse.urlparse(url)
-    query_dict: dict = urllib.parse.parse_qs(url_obj.query)
-
     tracking_param: [str] = [
         "utm_medium",
         "utm_source",
@@ -40,8 +35,13 @@ def remove_tracking_query(url: str) -> str:
         "mc_cid",
         "mc_sub",
     ]
-
+    url_obj: urllib.parse.ParseResult = urllib.parse.urlparse(url)
+    if url_obj.netloc == b"" or url_obj.netloc == "":
+        return None
+    query_dict: dict = urllib.parse.parse_qs(url_obj.query)
     new_query: dict = {k: v for k, v in query_dict.items() if k not in tracking_param}
-    query_str: str = urllib.parse.urlencode(new_query, doseq=True)
-    urlobj = url_obj._replace(query=query_str)
+    urlobj = url_obj._replace(
+        query=urllib.parse.urlencode(new_query, doseq=True),
+        fragment="",
+    )
     return urllib.parse.urlunparse(urlobj)
