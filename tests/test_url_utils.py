@@ -62,8 +62,8 @@ def test_extract_url():
             expected="https://www.example.com/?a=2",
         ),
         Case(
-            argument="あいう<https://www.example.com/?utm_medium=1>ああ",
-            expected="https://www.example.com/",
+            argument="あいう<https://www.du-soleil.com/?utm_medium=1>ああ",
+            expected="https://www.du-soleil.com/",
         ),
     ]
     for case in case_list:

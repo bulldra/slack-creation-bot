@@ -7,7 +7,7 @@ import requests
 def extract_url(text: str) -> str:
     if text is None:
         return None
-    links: [str] = re.findall(r"https?://[\w\/:%#\$\&\?\(\)~\.=\+\-]+", text)
+    links: [str] = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text)
     if len(links) == 0:
         return None
     else:
