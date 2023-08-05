@@ -63,5 +63,7 @@ def main(request: Request):
             return (res, 200, headers)
         else:
             return SlackRequestHandler(app).handle(request)
+    elif content_type == "application/x-www-form-urlencoded":
+        return SlackRequestHandler(app).handle(request)
     else:
         return ("Bad Request", 400)
