@@ -5,7 +5,9 @@ import requests
 
 
 def extract_url(text: str) -> str:
-    links: [str] = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text or "")
+    links: [str] = re.findall(
+        r"https?://[a-zA-Z0-9_/:%#\$&\?\(\)~\.=\+\-]+", text or ""
+    )
     if len(links) == 0:
         return None
     else:
@@ -18,7 +20,7 @@ def extract_url(text: str) -> str:
                     canonical_url = res.url
         except requests.exceptions.RequestException:
             pass
-        return remove_tracking_query(canonical_url)
+        return canonical_url
 
 
 def remove_tracking_query(url: str) -> str:
