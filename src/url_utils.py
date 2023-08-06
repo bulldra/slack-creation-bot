@@ -28,14 +28,11 @@ def remove_tracking_query(url: str) -> str:
         "utm_medium",
         "utm_source",
         "utm_campaign",
-        "gclid",
         "n_cid",
+        "gclid",
         "fbclid",
         "yclid",
         "msclkid",
-        "mc_eid",
-        "mc_cid",
-        "mc_sub",
     ]
     url_obj: urllib.parse.ParseResult = urllib.parse.urlparse(url)
     if url_obj.netloc == b"" or url_obj.netloc == "":
