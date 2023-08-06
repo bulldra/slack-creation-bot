@@ -41,6 +41,10 @@ S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82
             expected="https://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS\
 S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B",
         ),
+        Case(
+            argument="https://t.co/9nalLlGkkj?amp=1",
+            expected="https://www.du-soleil.com/entry/slack-url-share",
+        ),
     ]
     for case in case_list:
         actual = url_utils.extract_url(case.argument)
