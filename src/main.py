@@ -2,10 +2,10 @@ import json
 import logging
 import os
 
+import flask
 import functions_framework
 import google.cloud.logging
 import slack_bolt
-from flask import Request
 from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 
 import url_utils
@@ -44,12 +44,11 @@ def handle_reaction_added(event: dict):
 
 
 @functions_framework.http
-def main(request: Request):
+def main(request: flask.Request):
     if request.method != "POST":
-        return "Only POST requests are accepted", 405
-
+        return ("Only POST requests are accepted", 405)
     if request.headers.get("x-slack-retry-num"):
-        return "No need to resend", 200
+        return ("No need to resend", 200)
 
     content_type: str = request.headers.get("Content-Type")
     if content_type == "application/json":

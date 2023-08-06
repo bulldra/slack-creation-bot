@@ -1,4 +1,4 @@
-slack_manifest.json
+slack_app_manifest.json
 secrets.json
 deploy.sh
 
