@@ -39,8 +39,8 @@ def remove_tracking_query(url: str) -> str:
         return None
     query_dict: dict = urllib.parse.parse_qs(url_obj.query)
     new_query: dict = {k: v for k, v in query_dict.items() if k not in tracking_param}
-    urlobj = url_obj._replace(
+    url_obj = url_obj._replace(
         query=urllib.parse.urlencode(new_query, doseq=True),
         fragment="",
     )
-    return urllib.parse.urlunparse(urlobj)
+    return urllib.parse.urlunparse(url_obj)
