@@ -36,10 +36,10 @@ def test_extract_url():
             expected="https://www.example.com/?utm_medium=1&gclid=1dd&a=1&a=2#aaa",
         ),
         Case(
-            argument="あhttps://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS\
-S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8Bああ",
-            expected="https://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS\
-S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B",
+            argument="あhttps://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS"
+            "S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8Bああ",
+            expected="https://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS"
+            "S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B",
         ),
         Case(
             argument="https://t.co/9nalLlGkkj?amp=1",
