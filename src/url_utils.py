@@ -4,6 +4,12 @@ import urllib
 import requests
 
 
+def extract_and_remove_url(text: str) -> str:
+    url: str = extract_url(text)
+    url: str = canonicalize_url(url)
+    return remove_tracking_query(url)
+
+
 def extract_url(text: str) -> str:
     links: [str] = re.findall(
         r"https?://[a-zA-Z0-9_/:%#\$&\?\(\)~\.=\+\-]+", text or ""
@@ -11,19 +17,27 @@ def extract_url(text: str) -> str:
     if len(links) == 0:
         return None
     else:
-        canonical_url: str = links[0]
-        try:
-            with requests.get(canonical_url, stream=True) as res:
-                if res.status_code != 200:
-                    raise requests.exceptions.RequestException
-                else:
-                    canonical_url = res.url
-        except requests.exceptions.RequestException:
-            pass
-        return canonical_url
+        return links[0]
+
+
+def canonicalize_url(url: str) -> str:
+    if url is None or url == "":
+        return None
+    canonical_url: str = url
+    try:
+        with requests.get(canonical_url, stream=True) as res:
+            if res.status_code != 200:
+                raise requests.exceptions.RequestException
+            else:
+                canonical_url = res.url
+    except requests.exceptions.RequestException:
+        pass
+    return canonical_url
 
 
 def remove_tracking_query(url: str) -> str:
+    if url is None:
+        return None
     tracking_param: [str] = [
         "utm_medium",
         "utm_source",

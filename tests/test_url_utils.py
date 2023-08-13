@@ -41,15 +41,36 @@ def test_extract_url():
             expected="https://slack.com/intl/ja-jp/help/articles/218688467-Slack-%E3%81%AB-RS"
             "S-%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B",
         ),
+    ]
+    for case in case_list:
+        actual = url_utils.extract_url(case.argument)
+        print(
+            f"""url_utils.extract_url('{case.argument}')
+assert '{actual}' == '{case.expected}'"""
+        )
+
+        assert actual == case.expected
+
+
+def test_canonicalize_url():
+    case_list = [
+        Case(
+            argument=None,
+            expected=None,
+        ),
+        Case(
+            argument="",
+            expected=None,
+        ),
         Case(
             argument="https://t.co/9nalLlGkkj?amp=1",
             expected="https://www.du-soleil.com/entry/slack-url-share",
         ),
     ]
     for case in case_list:
-        actual = url_utils.extract_url(case.argument)
+        actual = url_utils.canonicalize_url(case.argument)
         print(
-            f"""url_utils.extract_url('{case.argument}')
+            f"""url_utils.canonicalize_url('{case.argument}')
 assert '{actual}' == '{case.expected}'"""
         )
 

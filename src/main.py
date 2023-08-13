@@ -35,6 +35,7 @@ def handle_reaction_added(event: dict):
 
         text: str = result["messages"][0]["text"]
         link: str = url_utils.extract_url(text)
+        link = url_utils.canonicalize_url(link)
         link = url_utils.remove_tracking_query(link)
 
         if link is not None:
