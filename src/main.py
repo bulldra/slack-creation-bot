@@ -34,10 +34,7 @@ def handle_reaction_added(event: dict):
         logger.debug(f"reaction at: {result}")
 
         text: str = result["messages"][0]["text"]
-        link: str = url_utils.extract_url(text)
-        link = url_utils.canonicalize_url(link)
-        link = url_utils.remove_tracking_query(link)
-
+        link: str = url_utils.extract_and_remove_url(text)
         if link is not None:
             app.client.chat_postMessage(
                 channel=SECRETS.get("SHARE_CHANNEL_ID"), text=link, unfurl_links=True
