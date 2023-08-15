@@ -1,6 +1,7 @@
 """
 Slackのリンクを扱うためのユーティリティ
 """
+import collections
 import os
 import re
 import urllib
@@ -14,7 +15,8 @@ def extract_and_remove_tracking_url(text: str) -> str:
     リンクを抽出してトラッキングURLを除去する
     """
     url: str = extract_url(text)
-    url: str = canonicalize_url(url)
+    url = redirect_url(url)
+    url = canonicalize_url(url)
     return remove_tracking_query(url)
 
 
@@ -47,13 +49,41 @@ def extract_url(text: str) -> str:
         return links[0]
 
 
+def redirect_url(url: str) -> str:
+    """
+    URLをリダイレクトする
+    """
+
+    if url is None or url == "":
+        return None
+
+    Redirect = collections.namedtuple("Redirect", ("url", "param"))
+    redirect_urls: [Redirect] = [
+        Redirect(url="https://www.google.com/url", param="url"),
+    ]
+
+    url_obj: urllib.parse.ParseResult = urllib.parse.urlparse(url)
+    path = f"{url_obj.scheme}://{url_obj.netloc}{url_obj.path}"
+    canonical_url: str = url
+
+    for redirect in redirect_urls:
+        if path == redirect.url:
+            query_dict: dict = urllib.parse.parse_qs(url_obj.query)
+            if redirect.param in query_dict:
+                canonical_url = query_dict[redirect.param][0]
+                break
+    return canonical_url
+
+
 def canonicalize_url(url: str) -> str:
     """
     URLを正規化する
     """
+
     if url is None or url == "":
         return None
     canonical_url: str = url
+
     try:
         with requests.get(canonical_url, stream=True, timeout=(1.0, 2.0)) as res:
             if res.status_code == 200:
@@ -129,7 +159,7 @@ def scraping(url: str) -> (str, str):
     """
 
     try:
-        res = requests.get(url, timeout=(1.0, 2.0))
+        res = requests.get(url, timeout=(3.0, 8.0))
     except requests.exceptions.RequestException:
         return None, None
 
