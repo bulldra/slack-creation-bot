@@ -1,3 +1,6 @@
+"""
+Slack App for sharing links
+"""
 import json
 import logging
 import os
@@ -8,11 +11,11 @@ import google.cloud.logging
 import slack_bolt
 from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 
-import url_utils
+import slack_link_utils
 
 logging_client: google.cloud.logging.Client = google.cloud.logging.Client()
 logging_client.setup_logging()
-logger: logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 SECRETS: dict = json.loads(os.getenv("SECRETS"))
@@ -25,16 +28,19 @@ app: slack_bolt.App = slack_bolt.App(
 
 @app.event("reaction_added")
 def handle_reaction_added(event: dict):
+    """
+    Handle reaction_added event
+    """
     if event["reaction"] == SECRETS.get("REACTION_EMOJI"):
-        channel_id: str = event["item"]["channel"]
-        ts: str = event["item"]["ts"]
+        item: dict = event.get("item")
+        channel_id: str = item.get("channel")
+        timestamp: str = item.get("ts")
         result: dict = app.client.conversations_history(
-            channel=channel_id, inclusive=True, latest=ts, limit=1
+            channel=channel_id, inclusive=True, latest=timestamp, limit=1
         )
-        logger.debug(f"reaction at: {result}")
-
+        logger.debug(result)
         text: str = result["messages"][0]["text"]
-        link: str = url_utils.extract_and_remove_url(text)
+        link: str = slack_link_utils.extract_and_remove_tracking_url(text)
         if link is not None:
             app.client.chat_postMessage(
                 channel=SECRETS.get("SHARE_CHANNEL_ID"), text=link, unfurl_links=True
@@ -43,6 +49,9 @@ def handle_reaction_added(event: dict):
 
 @functions_framework.http
 def main(request: flask.Request):
+    """
+    main処理
+    """
     if request.method != "POST":
         return ("Only POST requests are accepted", 405)
     if request.headers.get("x-slack-retry-num"):
