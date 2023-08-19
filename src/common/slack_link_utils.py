@@ -2,6 +2,7 @@
 Slackのリンクを扱うためのユーティリティ
 """
 import collections
+import html
 import os
 import re
 import urllib
@@ -32,8 +33,10 @@ def is_only_url(text: str) -> bool:
     URLのみかどうかの判定
     Slackの記法に従うため<>で囲まれている場合は除去する
     """
-    text = re.sub("<(.+?)>", "\\1", text).strip()
-    return text == extract_url(text)
+    if text is None:
+        return False
+    text = re.sub(r"<([^|>]+).*>$", "\\1", text)
+    return html.unescape(text) == extract_url(text)
 
 
 def extract_url(text: str) -> str:
@@ -41,12 +44,13 @@ def extract_url(text: str) -> str:
     URLを抽出する
     """
     links: [str] = re.findall(
-        r"https?://[a-zA-Z0-9_/:%#\$&\?\(\)~\.=\+\-]+", text or ""
+        r"https?://[a-zA-Z0-9_/:%#\$&;\?\(\)~\.=\+\-]+", text or ""
     )
     if len(links) == 0:
         return None
     else:
-        return links[0]
+        result: str = html.unescape(links[0])
+        return result
 
 
 def redirect_url(url: str) -> str:
