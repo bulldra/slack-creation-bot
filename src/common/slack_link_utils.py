@@ -124,3 +124,59 @@ def remove_tracking_query(url: str) -> str:
         fragment="",
     )
     return urllib.parse.urlunparse(url_obj)
+
+
+def convert_mrkdwn(markdown_text: str) -> str:
+    """convert markdown to mrkdwn"""
+
+    # コードブロックエスケープ
+    replacement = "!!!CODE_BLOCK!!!"
+    code_blocks = re.findall(
+        r"[^`]```([^`].+?[^`])```[^`]",
+        markdown_text,
+        flags=re.DOTALL,
+    )
+    markdown_text = re.sub(
+        r"([^`])```[^`].+?[^`]```([^`])",
+        rf"\1{replacement}\2",
+        markdown_text,
+        flags=re.DOTALL,
+    )
+
+    # リスト・数字リストも・に変換
+    markdown_text = re.sub(
+        r"^\s*[\*\+-]\s+(.*)\n",
+        r"• \1\n",
+        markdown_text,
+        flags=re.MULTILINE,
+    )
+
+    # イタリック
+    markdown_text = re.sub(
+        r"([^\*])\*([^\*].+?[^\*])\*([^\*])",
+        r"\1_\2_\3",
+        markdown_text,
+    )
+
+    # 太字
+    markdown_text = re.sub(
+        r"\*\*(.+?)\*\*",
+        r"*\1*",
+        markdown_text,
+    )
+
+    # 見出し
+    markdown_text = re.sub(
+        r"^#{1,6}\s*(.+?)\n",
+        r"*\1*\n",
+        markdown_text,
+        flags=re.MULTILINE,
+    )
+
+    # リンク
+    markdown_text = re.sub(r"!?\[\]\((.+?)\)", r"<\1>", markdown_text)
+    markdown_text = re.sub(r"!?\[(.+?)\]\((.+?)\)", r"<\2|\1>", markdown_text)
+
+    for code in code_blocks:
+        markdown_text = re.sub(replacement, f"```{code}```\n", markdown_text, count=1)
+    return markdown_text

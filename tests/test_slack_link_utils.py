@@ -269,3 +269,10 @@ def test_remove_tracking_url():
 assert '{actual}' == '{case.expected}'"""
         )
         assert actual == case.expected
+
+
+def test_mrkdwn():
+    """convert_mrkdwnのテスト"""
+    with open("tests/test_slack_link_utils.md", "r", encoding="utf-8") as file:
+        arg = file.read()
+        print(slack_link_utils.convert_mrkdwn(arg))
