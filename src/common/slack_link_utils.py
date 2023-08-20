@@ -3,18 +3,27 @@ Slackのリンクを扱うためのユーティリティ
 """
 import collections
 import html
-import os
 import re
 import urllib
 
 import requests
-from bs4 import BeautifulSoup
+
+
+def build_slack_link(url: str, title: str) -> str:
+    """Slackのリンクを生成する"""
+    if url is None or url == "":
+        return ""
+    escaped_url: str = html.escape(url)
+
+    if title is None or title == "":
+        return f"<{escaped_url}>"
+    else:
+        title = re.sub(r"\n", " ", title).strip()
+        return f"<{escaped_url}|{title}>"
 
 
 def extract_and_remove_tracking_url(text: str) -> str:
-    """
-    リンクを抽出してトラッキングURLを除去する
-    """
+    """リンクを抽出してトラッキングURLを除去する"""
     url: str = extract_url(text)
     url = redirect_url(url)
     url = canonicalize_url(url)
@@ -22,9 +31,7 @@ def extract_and_remove_tracking_url(text: str) -> str:
 
 
 def is_contains_url(text: str) -> bool:
-    """
-    URLが含まれているかどうかの判定
-    """
+    """URLが含まれているかどうかの判定"""
     return extract_url(text) is not None
 
 
@@ -40,9 +47,7 @@ def is_only_url(text: str) -> bool:
 
 
 def extract_url(text: str) -> str:
-    """
-    URLを抽出する
-    """
+    """URLを抽出する"""
     links: [str] = re.findall(
         r"https?://[a-zA-Z0-9_/:%#\$&;\?\(\)~\.=\+\-]+", text or ""
     )
@@ -54,9 +59,7 @@ def extract_url(text: str) -> str:
 
 
 def redirect_url(url: str) -> str:
-    """
-    URLをリダイレクトする
-    """
+    """URLをリダイレクトする"""
 
     if url is None or url == "":
         return None
@@ -80,9 +83,7 @@ def redirect_url(url: str) -> str:
 
 
 def canonicalize_url(url: str) -> str:
-    """
-    URLを正規化する
-    """
+    """URLを正規化する"""
 
     if url is None or url == "":
         return None
@@ -100,9 +101,7 @@ def canonicalize_url(url: str) -> str:
 
 
 def remove_tracking_query(url: str) -> str:
-    """
-    トラッキングクエリを除去する
-    """
+    """トラッキングクエリを除去する"""
     if url is None:
         return None
     tracking_param: [str] = [
@@ -125,68 +124,3 @@ def remove_tracking_query(url: str) -> str:
         fragment="",
     )
     return urllib.parse.urlunparse(url_obj)
-
-
-def is_allow_scraping(url: str):
-    """
-    スクレイピングできるかどうかの判定
-    """
-
-    blacklist_domain: [str] = [
-        "twitter.com",
-        "speakerdeck.com",
-        "youtube.com",
-    ]
-    black_list_ext: [str] = [
-        ".pdf",
-        ".jpg",
-        ".png",
-        ".gif",
-        ".jpeg",
-        ".zip",
-    ]
-    url_obj: urllib.parse.ParseResult = urllib.parse.urlparse(url)
-
-    if url_obj.netloc == b"" or url_obj.netloc == "":
-        return False
-    elif url_obj.netloc in blacklist_domain:
-        return False
-    elif os.path.splitext(url_obj.path)[1] in black_list_ext:
-        return False
-    else:
-        return True
-
-
-def scraping(url: str) -> (str, str):
-    """
-    スクレイピングの実施
-    """
-
-    try:
-        res = requests.get(url, timeout=(3.0, 8.0))
-    except requests.exceptions.RequestException:
-        return None, None
-
-    soup = BeautifulSoup(res.content, "html.parser")
-    title = url
-
-    if soup.title is not None and soup.title.string is not None:
-        title = re.sub(r"\n", " ", soup.title.string.strip())
-
-    for script in soup(
-        [
-            "script",
-            "style",
-            "link",
-            "header",
-            "footer",
-            "nav",
-            "iframe",
-            "aside",
-            "form",
-            "button",
-        ]
-    ):
-        script.decompose()
-    text: str = "\n".join([line for line in soup.stripped_strings])
-    return (title, text)
