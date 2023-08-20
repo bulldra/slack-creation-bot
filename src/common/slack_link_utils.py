@@ -9,7 +9,7 @@ import urllib
 import requests
 
 
-def build_slack_link(url: str, title: str) -> str:
+def build_link(url: str, title: str) -> str:
     """Slackのリンクを生成する"""
     if url is None or url == "":
         return ""
