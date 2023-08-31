@@ -38,21 +38,20 @@ def is_allow_scraping(url: str):
         return True
 
 
-def scraping(url: str) -> (str, str):
+def scraping(url: str) -> Site:
     """スクレイピングの実施"""
-
     res = requests.get(url, timeout=(3.0, 8.0))
     soup = BeautifulSoup(res.content, "html.parser")
     title = url
     if soup.title is not None and soup.title.string is not None:
         title = re.sub(r"\n", " ", soup.title.string.strip())
 
-    description = ""
+    description: str = None
     meta_discription = soup.find("meta", attrs={"name": "description"})
     if meta_discription and meta_discription.get("content"):
         description = meta_discription.get("content")
 
-    keywords = []
+    keywords: [str] = None
     meta_keywords = soup.find("meta", attrs={"name": "keywords"})
     if meta_keywords and meta_keywords.get("content"):
         keywords = meta_keywords.get("content").split(",")
@@ -72,5 +71,23 @@ def scraping(url: str) -> (str, str):
     ):
         script.decompose()
 
-    content: str = "".join([line for line in soup.stripped_strings])
+    for cr_tag in soup(
+        [
+            "br",
+            "div",
+            "table",
+            "li",
+            "tr",
+            "td",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+        ]
+    ):
+        cr_tag.insert_after("\n")
+    content: str = re.sub(r"[\n\s]+", "\n", soup.get_text())
+
     return Site(url, title, description, keywords, content)
