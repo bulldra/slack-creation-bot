@@ -34,4 +34,9 @@ assert '{actual}' == '{case.expected}'"""
 def test_scraping():
     """test scraping"""
     site = scraping_utils.scraping("https://note.com/shi3zblog/n/nca77cd7fe0c1")
-    print(site)
+
+    print(site.url)
+    print(site.title)
+    print(site.description)
+    print(site.keywords)
+    print(site.content)
