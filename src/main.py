@@ -1,4 +1,3 @@
-"""Slack App for sharing links"""
 import json
 import logging
 import os
@@ -50,5 +49,4 @@ def handle_reaction_added(event: dict[str, Any]):
 
 @functions_framework.http
 def main(request: flask.Request):
-    """main処理"""
     return handler.handle(request, app)
