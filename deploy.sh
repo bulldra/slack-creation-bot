@@ -7,9 +7,9 @@ gcloud functions deploy ${FUNCTION_NAME} \
 	--trigger-http \
 	--allow-unauthenticated \
 	--timeout=3s \
-	--min-instances=1 \
+	--min-instances=0 \
 	--max-instances=10 \
-	--memory=256Mi \
+	--memory=128Mi \
 	--source=src/ \
 	--entry-point=main \
 	--service-account ${SERVICE_ACCOUNT} \
